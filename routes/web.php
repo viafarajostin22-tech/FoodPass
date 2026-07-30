@@ -1,7 +1,40 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HistorialController;
+use App\Http\Controllers\MetodosPagoController;
+use App\Http\Controllers\MenuDigitalController;
+use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\CanjeController;
+use App\Http\Controllers\HarvestLedgerController;
 
+// Redirigir raíz al login
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
+});
+
+// Rutas públicas (solo para no autenticados)
+Route::middleware('guest')->group(function () {
+    Route::get('/login',     [LoginController::class,   'showLogin'])->name('login');
+    Route::post('/login',    [LoginController::class,   'login'])->name('login.post');
+    Route::get('/register',  [RegisterController::class,'showRegister'])->name('register');
+    Route::post('/register', [RegisterController::class,'register'])->name('register.post');
+});
+
+// Logout
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Rutas protegidas
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard',      [DashboardController::class,    'index'])->name('dashboard');
+    Route::get('/historial',      [HistorialController::class,    'index'])->name('historial');
+    Route::get('/metodos-pago',   [MetodosPagoController::class,  'index'])->name('metodos-pago');
+    Route::get('/menu-digital',   [MenuDigitalController::class,  'index'])->name('menu-digital');
+    Route::get('/perfil',         [PerfilController::class,       'index'])->name('perfil');
+    Route::put('/perfil',         [PerfilController::class,       'update'])->name('perfil.update');
+    Route::get('/canje',          [CanjeController::class,        'index'])->name('canje');
+    Route::get('/harvest-ledger', [HarvestLedgerController::class,'index'])->name('harvest-ledger');
 });
