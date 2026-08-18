@@ -144,27 +144,35 @@
                 
                 <!-- Hero Tarjeta Principal (2 cols) -->
                 <div class="lg:col-span-2 relative rounded-3xl overflow-hidden h-64 shadow-lg group">
-                    <!-- Imagen de fondo -->
-                    <img src="https://picsum.photos/seed/foodhero/1200/600" alt="Platillo Destacado" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                    <!-- Overlay gradiente -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
-                    
-                    <!-- Contenido Hero -->
-                    <div class="relative h-full flex flex-col justify-center p-8 lg:w-2/3">
-                        <div class="inline-block px-3 py-1 bg-fp-orange text-white text-[10px] font-bold uppercase tracking-wider rounded-md mb-4 self-start">
-                            Recomendación del Chef
+                    @if($platilloHero)
+                        <!-- Imagen de fondo -->
+                        <img src="https://picsum.photos/seed/{{ Str::slug($platilloHero->nombre) }}/1200/600"
+                             alt="{{ $platilloHero->nombre }}"
+                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <!-- Overlay gradiente -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
+
+                        <!-- Contenido Hero -->
+                        <div class="relative h-full flex flex-col justify-center p-8 lg:w-2/3">
+                            <div class="inline-block px-3 py-1 bg-fp-orange text-white text-[10px] font-bold uppercase tracking-wider rounded-md mb-4 self-start">
+                                Recomendación del Chef
+                            </div>
+                            <h2 class="text-3xl md:text-4xl font-title font-bold text-white leading-tight mb-3">
+                                {{ $platilloHero->nombre }}
+                            </h2>
+                            <p class="text-white/70 text-sm mb-6 max-w-md line-clamp-2">
+                                {{ $platilloHero->descripcion }}
+                            </p>
+                            <button class="bg-fp-orange hover:bg-[#e06c1c] text-white px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 self-start transition-colors shadow-lg shadow-fp-orange/30">
+                                <span class="material-symbols-outlined text-[18px]">shopping_cart</span>
+                                Seleccionar &nbsp; ${{ number_format($platilloHero->precio, 0, ',', '.') }}
+                            </button>
                         </div>
-                        <h2 class="text-3xl md:text-4xl font-title font-bold text-white leading-tight mb-3">
-                            Corte Artisan con<br>Finas Hierbas
-                        </h2>
-                        <p class="text-white/70 text-sm mb-6 max-w-md line-clamp-2">
-                            Disfruta de nuestro corte premium sellado a la perfección, bañado en mantequilla de romero y acompañado de vegetales de temporada asados.
-                        </p>
-                        <button class="bg-fp-orange hover:bg-[#e06c1c] text-white px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 self-start transition-colors shadow-lg shadow-fp-orange/30">
-                            <span class="material-symbols-outlined text-[18px]">shopping_cart</span>
-                            Seleccionar &nbsp; $45.50
-                        </button>
-                    </div>
+                    @else
+                        <div class="absolute inset-0 bg-fp-sidebar flex items-center justify-center">
+                            <p class="text-white/60 text-sm">No hay platillo destacado disponible.</p>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Tarjetas Derecha (1 col apiladas) -->
@@ -206,142 +214,70 @@
                         <p class="text-gray-500 text-sm">Elige entre nuestras categorías cuidadosamente elaboradas.</p>
                     </div>
                     
-                    <!-- Tabs -->
+                    <!-- Tabs de Categoría -->
                     <div class="flex items-center gap-2 p-1 bg-white rounded-xl shadow-sm border border-gray-100 self-start md:self-auto overflow-x-auto">
-                        <button class="px-4 py-2 bg-fp-text-dark text-white text-sm font-medium rounded-lg whitespace-nowrap shadow-sm">Todos</button>
-                        <button class="px-4 py-2 text-gray-500 hover:text-fp-sidebar text-sm font-medium rounded-lg whitespace-nowrap transition-colors">Entradas</button>
-                        <button class="px-4 py-2 text-gray-500 hover:text-fp-sidebar text-sm font-medium rounded-lg whitespace-nowrap transition-colors">Plato Fuerte</button>
-                        <button class="px-4 py-2 text-gray-500 hover:text-fp-sidebar text-sm font-medium rounded-lg whitespace-nowrap transition-colors">Postres</button>
+                        @php
+                            $tabs = [
+                                'todos'        => 'Todos',
+                                'entrada'      => 'Entradas',
+                                'plato_fuerte' => 'Plato Fuerte',
+                                'postre'       => 'Postres',
+                                'bebida'       => 'Bebidas',
+                            ];
+                        @endphp
+                        @foreach($tabs as $key => $label)
+                            <a href="{{ route('menu-digital', $key !== 'todos' ? ['categoria' => $key] : []) }}"
+                               class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-colors
+                                      {{ $categoriaActiva === $key
+                                           ? 'bg-fp-text-dark text-white shadow-sm'
+                                           : 'text-gray-500 hover:text-fp-sidebar' }}">
+                                {{ $label }}
+                            </a>
+                        @endforeach
                     </div>
                 </div>
 
                 <!-- Grid Platos (4 cols) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    
-                    <!-- Fila 1 -->
-                    <!-- Item 1 -->
-                    <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
-                        <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4">
-                            <img src="https://picsum.photos/seed/salad/400/300" alt="Artisan Salad Bowl" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                            <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur text-gray-400 hover:text-red-500 flex items-center justify-center transition-colors">
-                                <span class="material-symbols-outlined text-[18px]">favorite</span>
-                            </button>
-                        </div>
-                        <h3 class="font-title font-bold text-fp-sidebar mb-1 line-clamp-1">Artisan Salad Bowl</h3>
-                        <p class="text-xs text-gray-400 mb-4 line-clamp-2 flex-1">Mix de hojas verdes, quinoa, aguacate, tomates cherry y vinagreta cítrica.</p>
-                        <div class="flex items-center justify-between mt-auto">
-                            <span class="font-title font-extrabold text-lg text-fp-orange">$18.25</span>
-                            <button class="bg-fp-orange/10 hover:bg-fp-orange text-fp-orange hover:text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                                Seleccionar
-                            </button>
-                        </div>
-                    </div>
 
-                    <!-- Item 2 -->
-                    <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
-                        <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4">
-                            <img src="https://picsum.photos/seed/signature/400/300" alt="FoodPass Signature" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <h3 class="font-title font-bold text-fp-sidebar mb-1 line-clamp-1">FoodPass Signature</h3>
-                        <p class="text-xs text-gray-400 mb-4 line-clamp-2 flex-1">Nuestra hamburguesa especial con pan brioche artesanal y salsa secreta.</p>
-                        <div class="flex items-center justify-between mt-auto">
-                            <span class="font-title font-extrabold text-lg text-fp-orange">$14.50</span>
-                            <button class="bg-fp-orange/10 hover:bg-fp-orange text-fp-orange hover:text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                                Seleccionar
-                            </button>
-                        </div>
-                    </div>
+                    @forelse($platillos as $platillo)
+                        <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
+                            <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4">
+                                {{-- Imagen del platillo o placeholder único por nombre --}}
+                                <img src="{{ $platillo->imagen
+                                    ? asset('storage/' . $platillo->imagen)
+                                    : 'https://picsum.photos/seed/' . Str::slug($platillo->nombre) . '/400/300' }}"
+                                     alt="{{ $platillo->nombre }}"
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
 
-                    <!-- Item 3 -->
-                    <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
-                        <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4">
-                            <img src="https://picsum.photos/seed/pasta/400/300" alt="Pasta del Huerto" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <h3 class="font-title font-bold text-fp-sidebar mb-1 line-clamp-1">Pasta del Huerto</h3>
-                        <p class="text-xs text-gray-400 mb-4 line-clamp-2 flex-1">Fettuccine fresco con pesto genovés, tomates asados y parmesano reggiano.</p>
-                        <div class="flex items-center justify-between mt-auto">
-                            <span class="font-title font-extrabold text-lg text-fp-orange">$16.00</span>
-                            <button class="bg-fp-orange/10 hover:bg-fp-orange text-fp-orange hover:text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                                Seleccionar
-                            </button>
-                        </div>
-                    </div>
+                                {{-- Badge de categoría --}}
+                                <span class="absolute top-3 left-3 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider
+                                    {{ $platillo->categoria === 'plato_fuerte' ? 'bg-fp-orange/90 text-white' : '' }}
+                                    {{ $platillo->categoria === 'entrada'      ? 'bg-green-500/90 text-white'   : '' }}
+                                    {{ $platillo->categoria === 'postre'       ? 'bg-pink-500/90 text-white'    : '' }}
+                                    {{ $platillo->categoria === 'bebida'       ? 'bg-blue-500/90 text-white'    : '' }}">
+                                    {{ str_replace('_', ' ', $platillo->categoria) }}
+                                </span>
+                            </div>
 
-                    <!-- Item 4 -->
-                    <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
-                        <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4">
-                            <img src="https://picsum.photos/seed/morning/400/300" alt="Morning Delight" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <h3 class="font-title font-bold text-fp-sidebar mb-1 line-clamp-1">Morning Delight</h3>
-                        <p class="text-xs text-gray-400 mb-4 line-clamp-2 flex-1">Tostadas francesas con frutos rojos frescos, mascarpone y jarabe de arce real.</p>
-                        <div class="flex items-center justify-between mt-auto">
-                            <span class="font-title font-extrabold text-lg text-fp-orange">$12.75</span>
-                            <button class="bg-fp-orange/10 hover:bg-fp-orange text-fp-orange hover:text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                                Seleccionar
-                            </button>
-                        </div>
-                    </div>
+                            <h3 class="font-title font-bold text-fp-sidebar mb-1 line-clamp-1">{{ $platillo->nombre }}</h3>
+                            <p class="text-xs text-gray-400 mb-4 line-clamp-2 flex-1">{{ $platillo->descripcion }}</p>
 
-                    <!-- Fila 2 -->
-                    <!-- Item 5 -->
-                    <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
-                        <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4">
-                            <img src="https://picsum.photos/seed/ramen/400/300" alt="Kyoto Ramen Bowl" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="flex items-center justify-between mt-auto">
+                                <span class="font-title font-extrabold text-lg text-fp-orange">
+                                    ${{ number_format($platillo->precio, 0, ',', '.') }}
+                                </span>
+                                <button class="bg-fp-orange/10 hover:bg-fp-orange text-fp-orange hover:text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
+                                    Seleccionar
+                                </button>
+                            </div>
                         </div>
-                        <h3 class="font-title font-bold text-fp-sidebar mb-1 line-clamp-1">Kyoto Ramen Bowl</h3>
-                        <p class="text-xs text-gray-400 mb-4 line-clamp-2 flex-1">Caldo tonkotsu de 12 horas, chashu tierno, huevo marinado y fideos frescos.</p>
-                        <div class="flex items-center justify-between mt-auto">
-                            <span class="font-title font-extrabold text-lg text-fp-orange">$21.50</span>
-                            <button class="bg-fp-orange/10 hover:bg-fp-orange text-fp-orange hover:text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                                Seleccionar
-                            </button>
+                    @empty
+                        <div class="col-span-4 flex flex-col items-center justify-center py-20 text-center">
+                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-4">restaurant</span>
+                            <p class="text-gray-400 font-medium">No hay platillos disponibles en esta categoría.</p>
                         </div>
-                    </div>
-
-                    <!-- Item 6 -->
-                    <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
-                        <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4">
-                            <img src="https://picsum.photos/seed/pizza/400/300" alt="Pizza Margherita Luxe" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <h3 class="font-title font-bold text-fp-sidebar mb-1 line-clamp-1">Pizza Margherita Luxe</h3>
-                        <p class="text-xs text-gray-400 mb-4 line-clamp-2 flex-1">Masa madre horneada a la leña, mozzarella di bufala y albahaca fresca.</p>
-                        <div class="flex items-center justify-between mt-auto">
-                            <span class="font-title font-extrabold text-lg text-fp-orange">$15.90</span>
-                            <button class="bg-fp-orange/10 hover:bg-fp-orange text-fp-orange hover:text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                                Seleccionar
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Item 7 -->
-                    <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
-                        <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4">
-                            <img src="https://picsum.photos/seed/ribs/400/300" alt="Honey BBQ Ribs" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <h3 class="font-title font-bold text-fp-sidebar mb-1 line-clamp-1">Honey BBQ Ribs</h3>
-                        <p class="text-xs text-gray-400 mb-4 line-clamp-2 flex-1">Costillas de cerdo en cocción lenta, glaseadas con miel y salsa barbacoa ahumada.</p>
-                        <div class="flex items-center justify-between mt-auto">
-                            <span class="font-title font-extrabold text-lg text-fp-orange">$24.00</span>
-                            <button class="bg-fp-orange/10 hover:bg-fp-orange text-fp-orange hover:text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                                Seleccionar
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Item 8 -->
-                    <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
-                        <div class="relative w-full h-40 rounded-2xl overflow-hidden mb-4">
-                            <img src="https://picsum.photos/seed/fondant/400/300" alt="Velvet Chocolate Fondant" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <h3 class="font-title font-bold text-fp-sidebar mb-1 line-clamp-1">Velvet Chocolate Fondant</h3>
-                        <p class="text-xs text-gray-400 mb-4 line-clamp-2 flex-1">Volcán de chocolate oscuro belga con centro líquido y helado de vainilla.</p>
-                        <div class="flex items-center justify-between mt-auto">
-                            <span class="font-title font-extrabold text-lg text-fp-orange">$9.50</span>
-                            <button class="bg-fp-orange/10 hover:bg-fp-orange text-fp-orange hover:text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
-                                Seleccionar
-                            </button>
-                        </div>
-                    </div>
+                    @endforelse
 
                 </div>
             </section>

@@ -21,5 +21,12 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // RF04/RF05 – Datos de demo para restaurantes y platillos
+        $this->call([
+            RestauranteSeeder::class,
+            PlatilloSeeder::class,
+        ]);
     }
 }
+

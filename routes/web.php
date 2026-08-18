@@ -10,6 +10,8 @@ use App\Http\Controllers\MenuDigitalController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\CanjeController;
 use App\Http\Controllers\HarvestLedgerController;
+use App\Http\Controllers\PlatilloController;
+use App\Http\Controllers\RestauranteController;
 
 // Redirigir raíz al login
 Route::get('/', function () {
@@ -37,4 +39,20 @@ Route::middleware('auth')->group(function () {
     Route::put('/perfil',         [PerfilController::class,       'update'])->name('perfil.update');
     Route::get('/canje',          [CanjeController::class,        'index'])->name('canje');
     Route::get('/harvest-ledger', [HarvestLedgerController::class,'index'])->name('harvest-ledger');
+
+    // ── RF04/RF05/RF06 – Administración de Restaurantes y Platillos ──────────
+    Route::prefix('admin')->name('admin.')->group(function () {
+
+        // CRUD Restaurantes
+        Route::resource('restaurantes', RestauranteController::class);
+
+        // CRUD Platillos
+        Route::resource('platillos', PlatilloController::class);
+
+        // RF06 – Toggle disponibilidad (PATCH /admin/platillos/{platillo}/disponibilidad)
+        Route::patch(
+            'platillos/{platillo}/disponibilidad',
+            [PlatilloController::class, 'toggleDisponibilidad']
+        )->name('platillos.disponibilidad');
+    });
 });
